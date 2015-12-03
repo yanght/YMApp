@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>礼品礼券</key>
+	<string>lipinkaquan</string>
+	<key>饮料酒水</key>
+	<string>yinliaojiushui</string>
+	<key>粮油杂货</key>
+	<string>liangyouzahuo</string>
+	<key>方便速食</key>
+	<string>fangbiansushi</string>
+	<key>新鲜蔬菜</key>
+	<string>xinxianshucai</string>
+	<key>乳品糕点</key>
+	<string>rupingaodian</string>
+	<key>海鲜水产</key>
+	<string>haixianshuichan</string>
+	<key>禽类蛋品</key>
+	<string>qinleidanpin</string>
+	<key>精选肉类</key>
+	<string>jingxuanroulei</string>
+	<key>国产水果</key>
+	<string>guochanshuiguo</string>
+	<key>进口水果</key>
+	<string>jinkoushuiguo</string>
+</dict>
+</plist>
