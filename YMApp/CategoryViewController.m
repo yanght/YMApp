@@ -13,7 +13,7 @@
 #import "ProductListViewController.h"
 #import "MBProgressHUD.h"
 
-@interface CategoryViewController ()<MBProgressHUDDelegate,UITableViewDataSource,UITableViewDelegate>
+@interface CategoryViewController ()<MBProgressHUDDelegate, UITableViewDataSource,UITableViewDelegate>
 {
     NSMutableArray *_categoryList;
     UITableView *_tableview;
@@ -26,20 +26,23 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor=[UIColor whiteColor];
-    UIWindow *window = [[UIApplication sharedApplication].windows lastObject];
-    _HUD= [[MBProgressHUD alloc] initWithWindow:window];
-    _HUD.detailsLabelFont = [UIFont boldSystemFontOfSize:16];
-    [window addSubview:_HUD];
-    [_HUD show:YES];
-    _HUD.userInteractionEnabled = NO;
-    [_HUD showWhileExecuting:@selector(getData) onTarget:self withObject:nil animated:YES];
-   //[self getData];
-    
     [self initTableView];
     
+    
+    _HUD = [Utils createHUD];
+    [self.view addSubview:_HUD];
+   
+    [self getData];
     // 定义所有子页面返回按钮的名称
     self.navigationItem.backBarButtonItem=[[UIBarButtonItem alloc]initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];
   }
+#pragma mark -
+#pragma mark MBProgressHUDDelegate methods
+- (void)hudWasHidden:(MBProgressHUD *)hud {
+    // Remove HUD from screen when the HUD was hidded
+    [_HUD removeFromSuperview];
+    _HUD = nil;
+}
 
 -(void) initTableView
 {
@@ -67,6 +70,7 @@
     [cell setCategory:category];
     cell.selectionStyle=UITableViewCellSelectionStyleNone;
     cell.backgroundColor=[UIColor whiteColor];
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     return cell;
 
 }
@@ -101,10 +105,7 @@
 {
     return REAL_WIDTH1(160);
 }
-//-(void)hudWasHidden:(MBProgressHUD *)hud
-//{
-//    [hud removeFromSuperview];
-//}
+
 -(void)getData
 {
     //sleep(3);
@@ -123,12 +124,12 @@
             [_categoryList addObject:[[MCategory alloc]initWithDic:obj]];
         }];
         [_tableview reloadData];
-
+        [_HUD hide:YES];
     //NSLog(@"++++++%@",categoryList);
         
     }failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         NSLog(@"发生错误！%@",error);
-    //[HUD removeFromSuperview];
+    [_HUD hide:YES];
     }];
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
     [queue addOperation:operation];

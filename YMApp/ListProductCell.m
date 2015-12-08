@@ -70,7 +70,7 @@
 #pragma 商品图片
     _imgview.frame=CGRectMake(REAL_WIDTH1(25), REAL_WIDTH1(25), REAL_WIDTH1(148), REAL_WIDTH1(148));
     //[_imgview  sd_setImageWithURL:[[NSURL alloc]initWithString:product.SmallPic ]];
-    [_imgview sd_setImageWithURL:[[NSURL alloc]initWithString:product.SmallPic] placeholderImage:[UIImage imageNamed:@""] options:SDWebImageRetryFailed];
+    [_imgview sd_setImageWithURL:[[NSURL alloc]initWithString:[NSString stringWithFormat:@"%@",product.SmallPic]] placeholderImage:[UIImage imageNamed:@""] options:SDWebImageRetryFailed];
     _imgview.contentMode=UIViewContentModeScaleToFill;
     
     
@@ -128,7 +128,7 @@
     //    //下分割线
     //    CGContextSetStrokeColorWithColor(context, [UIColor blueColor].CGColor);
     
-    CGContextStrokeRect(context, CGRectMake(0, 0, rect.size.width , 0.01));
+    CGContextStrokeRect(context, CGRectMake(0, self.frame.size.height, rect.size.width , 0.01));
 }
 
 @end

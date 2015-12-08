@@ -103,7 +103,7 @@
         [self initGroupData:@"ShortcutIcons" :[responseData objectForKey:@"ShortcutIcons"]];
         
         [self.tableView reloadData];
-        
+        [self.tableView.mj_header endRefreshing];
         //NSLog(@"++++++%@",categoryList);
         
     }failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -160,7 +160,7 @@
 //有多少个子节点
 -(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 8;
+    return 7;
 }
 
 //每个子节点与多少行
@@ -402,24 +402,23 @@
 
 -(void) setupRefresh
 {
-    [self.tableView addGifHeaderWithRefreshingTarget:self refreshingAction:@selector(refreshTable)];
     NSMutableArray *images=[NSMutableArray array];
-      UIImage *image=[UIImage imageNamed:@"dropdown_loading_01"];
-    [images addObject:image];
-    
-    [self.tableView.gifHeader setImages:images forState:MJRefreshHeaderStateIdle];
-    
-    [self.tableView.gifHeader setImages:images forState:MJRefreshHeaderStatePulling];
-    
-    [self.tableView.gifHeader setImages:images forState:MJRefreshHeaderStateRefreshing];
-    [self.tableView.gifHeader beginRefreshing];
-    
+    UIImage *image=[UIImage imageNamed:@"dropdown_loading_01"];
+       [images addObject:image];
+    MJRefreshGifHeader *header=[MJRefreshGifHeader headerWithRefreshingTarget:self refreshingAction:@selector(refreshTable)];
+    [header setImages:images forState:MJRefreshStateIdle];
+    // 设置即将刷新状态的动画图片（一松开就会刷新的状态）
+    [header setImages:images forState:MJRefreshStatePulling];
+    // 设置正在刷新状态的动画图片
+    [header setImages:images forState:MJRefreshStateRefreshing];
+    // 设置header
+    self.tableView.mj_header = header;
+    [self.tableView.mj_header beginRefreshing];
 }
 -(void)refreshTable
 {
-    [self.tableView reloadData];
-    
-    [self.tableView.gifHeader endRefreshing];
+    [self getHomeData];
+    //[self.tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning {
