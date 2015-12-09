@@ -14,6 +14,7 @@
 #import "MBProgressHUD.h"
 #import "MJRefresh/MJRefresh.h"
 
+
 @interface ProductListViewController ()<MBProgressHUDDelegate,UITableViewDataSource,UITableViewDelegate>
 {
     UITableView *_tableView;
@@ -27,6 +28,8 @@
     NSString *_sort;
     NSUInteger _pageSize;
     NSUInteger _pageIndex;
+    BOOL _scrollUporDown;
+    BOOL _hidden;
 }
 
 @end
@@ -45,7 +48,7 @@
     _products=[[NSMutableArray alloc]init];
     
     UIView *view=[[UIView alloc]initWithFrame:CGRectMake(0,0, screen_width, screen_height)];
-    view.backgroundColor=[UIColor whiteColor];
+    view.backgroundColor=RGB(246, 246, 246);
     self.view=view;
     
     // 定义所有子页面返回按钮的名称
@@ -58,6 +61,32 @@
     
     [self getProductList];
 }
+//- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+//    if ([scrollView isEqual:_tableView]) {
+//        static float newy = 0;
+//        static float oldy = 0;
+//        newy = scrollView.contentOffset.y ;
+//        NSLog(@"%f",newy);
+//        if (newy>0) {
+//            if (newy>oldy) {
+//                NSLog(@"向上");
+//                [UIView animateWithDuration:0.5 animations:^{
+//                    _headerView.frame=CGRectMake(0, 0, W(_headerView), H(_headerView));
+//                    _tableView.frame=CGRectMake(0, 64, W(_tableView), H(_tableView)+64);
+//                    newy=scrollView.contentOffset.y;
+//                }];
+//            }else if(newy<oldy-30)
+//            {
+//                [UIView animateWithDuration:0.5 animations:^{
+//                    NSLog(@"向下");
+//                    _headerView.frame=CGRectMake(0, 64, W(_headerView), H(_headerView));
+//                    _tableView.frame=CGRectMake(0, 64+H(_headerView)+2, W(_tableView), H(_tableView));
+//                    newy=scrollView.contentOffset.y;
+//                }];
+//            }
+//        }
+//    }
+//}
 
 -(void)initHeader
 {
@@ -67,30 +96,32 @@
     
     NSArray *titles=[NSArray arrayWithObjects:@"默认",@"价格",@"销量", nil];
     
+    
+    
     for (int i=0; i<3; i++) {
-        UIView *buttonview=[[UIView alloc]init];
-        CGRect frame=CGRectMake((screen_width/3.0)*i, 0, screen_width/3.0, H(_headerView));
-        [buttonview setFrame:frame];
-        [_headerView addSubview:buttonview];
+//        UIView *buttonview=[[UIView alloc]init];
+//        CGRect frame=CGRectMake((screen_width/3.0)*i, 0, screen_width/3.0, H(_headerView));
+//        [buttonview setFrame:frame];
+//        [_headerView addSubview:buttonview];
         
         UIButton *button=[[UIButton alloc]init];
-        CGRect buttonFrame=CGRectMake(REAL_WIDTH1(45), 0, W(buttonview)-REAL_WIDTH1(45)*2, H(buttonview)-2);
+        CGRect buttonFrame=CGRectMake(i*(W(_headerView)/3.0), 0, W(_headerView)/3.0, H(_headerView)-2);
         [button setFrame:buttonFrame];
         [button setTitle:[titles objectAtIndex:i] forState:UIControlStateNormal];
-        button.titleLabel.font=[UIFont systemFontOfSize:14];
+        button.titleLabel.font=[UIFont systemFontOfSize:16];
         [button setTitleColor:GRAYCOLOR forState:UIControlStateNormal];
-        [buttonview addSubview:button];
-        
+        //[buttonview addSubview:button];
+        [_headerView addSubview:button];
         [button addTarget:self action:@selector(sortButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-        
-        _lineLabel=[[UILabel alloc]initWithFrame:CGRectMake(REAL_WIDTH1(45), H(buttonview)-2, W(button), 2)];
-        
-        _lineLabel.backgroundColor=MAINCOLOR;
-        [_headerView addSubview:_lineLabel];
         if (i==0) {
             [button setTitleColor:MAINCOLOR forState:UIControlStateNormal];
         }
     }
+    
+    _lineLabel=[[UILabel alloc]initWithFrame:CGRectMake(REAL_WIDTH1(45), H(_headerView)-2, W(_headerView)/3.0-REAL_WIDTH1(90), 2)];
+    
+    _lineLabel.backgroundColor=MAINCOLOR;
+    [_headerView addSubview:_lineLabel];
 }
 
 -(void)sortButtonClick:(id)sender
@@ -108,21 +139,32 @@
     {
         _sort=@"SalesVolumeAsc";
     }
-//    CGRect frame=_lineLabel.frame;
-//    frame.origin.x=100;
-//    _lineLabel.frame=frame;
+    CGRect frame=_lineLabel.frame;
+    frame.origin.x=button.frame.origin.x+REAL_WIDTH1(45);
+    _lineLabel.frame=frame;
+    [button setTitleColor:MAINCOLOR forState:UIControlStateNormal];
+    
+    NSArray *buttons=[_headerView subviews];
+    [buttons enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isMemberOfClass:[UIButton class]]) {
+            UIButton *tmpbutton=obj;
+            if([tmpbutton.titleLabel.text isEqualToString:title])
+            {
+                [tmpbutton setTitleColor:MAINCOLOR forState:UIControlStateNormal];
+            }else
+            {
+                [tmpbutton setTitleColor:GRAYCOLOR forState:UIControlStateNormal];
+            }
+        }
+       }];
     _pageIndex=1;
-    //[_products removeAllObjects];
     [self getProductList];
     [_tableView setContentOffset:CGPointMake(0, 0) animated:FALSE];
-//    
-//    [_HUD showWhileExecuting:@selector(getProductList:) onTarget:self withObject:sortType animated:YES];
-    
 }
 
 -(void)initTableView
 {
-    _tableView=[[UITableView alloc]initWithFrame:CGRectMake(0,64+H(_headerView), screen_width, screen_height-64-H(_headerView)-49) style:UITableViewStylePlain];
+    _tableView=[[UITableView alloc]initWithFrame:CGRectMake(0,64+H(_headerView)+2, screen_width, screen_height-64-H(_headerView)-49-2) style:UITableViewStylePlain];
     _tableView.dataSource=self;
     _tableView.delegate=self;
     _tableView.separatorStyle=UITableViewCellAccessoryNone;
