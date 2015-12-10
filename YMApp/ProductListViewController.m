@@ -15,7 +15,7 @@
 #import "MJRefresh/MJRefresh.h"
 
 
-@interface ProductListViewController ()<MBProgressHUDDelegate,UITableViewDataSource,UITableViewDelegate>
+@interface ProductListViewController ()<MBProgressHUDDelegate,UITableViewDataSource,UITableViewDelegate,UIGestureRecognizerDelegate>
 {
     UITableView *_tableView;
     NSMutableArray *_products;
@@ -58,35 +58,8 @@
     [self initHeader];
     [self initTableView];
     [self initFooterRefersh];
-    
     [self getProductList];
 }
-//- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
-//    if ([scrollView isEqual:_tableView]) {
-//        static float newy = 0;
-//        static float oldy = 0;
-//        newy = scrollView.contentOffset.y ;
-//        NSLog(@"%f",newy);
-//        if (newy>0) {
-//            if (newy>oldy) {
-//                NSLog(@"向上");
-//                [UIView animateWithDuration:0.5 animations:^{
-//                    _headerView.frame=CGRectMake(0, 0, W(_headerView), H(_headerView));
-//                    _tableView.frame=CGRectMake(0, 64, W(_tableView), H(_tableView)+64);
-//                    newy=scrollView.contentOffset.y;
-//                }];
-//            }else if(newy<oldy-30)
-//            {
-//                [UIView animateWithDuration:0.5 animations:^{
-//                    NSLog(@"向下");
-//                    _headerView.frame=CGRectMake(0, 64, W(_headerView), H(_headerView));
-//                    _tableView.frame=CGRectMake(0, 64+H(_headerView)+2, W(_tableView), H(_tableView));
-//                    newy=scrollView.contentOffset.y;
-//                }];
-//            }
-//        }
-//    }
-//}
 
 -(void)initHeader
 {
@@ -95,15 +68,7 @@
     [self.view addSubview:_headerView ];
     
     NSArray *titles=[NSArray arrayWithObjects:@"默认",@"价格",@"销量", nil];
-    
-    
-    
     for (int i=0; i<3; i++) {
-//        UIView *buttonview=[[UIView alloc]init];
-//        CGRect frame=CGRectMake((screen_width/3.0)*i, 0, screen_width/3.0, H(_headerView));
-//        [buttonview setFrame:frame];
-//        [_headerView addSubview:buttonview];
-        
         UIButton *button=[[UIButton alloc]init];
         CGRect buttonFrame=CGRectMake(i*(W(_headerView)/3.0), 0, W(_headerView)/3.0, H(_headerView)-2);
         [button setFrame:buttonFrame];
@@ -124,6 +89,26 @@
     [_headerView addSubview:_lineLabel];
 }
 
+-(void)initTableView
+{
+    _tableView=[[UITableView alloc]initWithFrame:CGRectMake(0,64+H(_headerView)+2, screen_width, screen_height-64-H(_headerView)-49-2) style:UITableViewStylePlain];
+    _tableView.dataSource=self;
+    _tableView.delegate=self;
+    _tableView.separatorStyle=UITableViewCellAccessoryNone;
+    _tableView.backgroundColor=RGB(246, 246, 246);
+    [self.view addSubview:_tableView];
+    
+#pragma 添加UIScrollView滑动手势代理
+    [_tableView.panGestureRecognizer addTarget:self action:@selector(handlPan:)];
+}
+#pragma 初始化上拉刷新控件
+-(void)initFooterRefersh
+{
+    _footer=[MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(getProductList)];
+    _tableView.mj_footer=_footer;
+}
+
+#pragma 排序按钮点击事件
 -(void)sortButtonClick:(id)sender
 {
     UIButton *button=sender;
@@ -139,9 +124,12 @@
     {
         _sort=@"SalesVolumeAsc";
     }
-    CGRect frame=_lineLabel.frame;
-    frame.origin.x=button.frame.origin.x+REAL_WIDTH1(45);
-    _lineLabel.frame=frame;
+    [UIView animateWithDuration:0.3 animations:^{
+        CGRect frame=_lineLabel.frame;
+        frame.origin.x=button.frame.origin.x+REAL_WIDTH1(45);
+        _lineLabel.frame=frame;
+    }];
+    
     [button setTitleColor:MAINCOLOR forState:UIControlStateNormal];
     
     NSArray *buttons=[_headerView subviews];
@@ -156,36 +144,43 @@
                 [tmpbutton setTitleColor:GRAYCOLOR forState:UIControlStateNormal];
             }
         }
-       }];
+    }];
     _pageIndex=1;
     [self getProductList];
     [_tableView setContentOffset:CGPointMake(0, 0) animated:FALSE];
 }
 
--(void)initTableView
-{
-    _tableView=[[UITableView alloc]initWithFrame:CGRectMake(0,64+H(_headerView)+2, screen_width, screen_height-64-H(_headerView)-49-2) style:UITableViewStylePlain];
-    _tableView.dataSource=self;
-    _tableView.delegate=self;
-    _tableView.separatorStyle=UITableViewCellAccessoryNone;
-    _tableView.backgroundColor=RGB(246, 246, 246);
-    [self.view addSubview:_tableView];
-}
-
--(void)initFooterRefersh
-{
-    _footer=[MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(getProductList)];
-    _tableView.mj_footer=_footer;
-}
-
+#pragma 上拉刷新按钮代理事件
 -(void)footerBeginRefreshing
 {
     [self getProductList];
 }
 
--(void)hudWasHidden:(MBProgressHUD *)hud
+-(void)handlPan:(UIPanGestureRecognizer *)rec
 {
-    [hud removeFromSuperview];
+    CGPoint point=[rec translationInView:_tableView];
+    if(point.y<-30)
+    {
+         NSLog(@"向上");
+        [UIView animateWithDuration:0.5 animations:^{
+            _headerView.frame=CGRectMake(0, 0, W(_headerView), H(_headerView));
+            _tableView.frame=CGRectMake(0, 64, W(_tableView), screen_height-64);
+            [_tableView reloadData];
+            CGRect tabFrame=self.tabBarController.tabBar.frame;
+            tabFrame.origin.y=screen_height;
+            self.tabBarController.tabBar.frame=tabFrame;
+        }];
+    }else if(point.y>30)
+    {
+        [UIView animateWithDuration:0.5 animations:^{
+            NSLog(@"向下");
+            _headerView.frame=CGRectMake(0, 64, W(_headerView), H(_headerView));
+            _tableView.frame=CGRectMake(0, 64+H(_headerView)+2, W(_tableView), screen_height-64-H(_headerView)-2-49);
+            CGRect tabFrame=self.tabBarController.tabBar.frame;
+            tabFrame.origin.y=screen_height-49;
+            self.tabBarController.tabBar.frame=tabFrame;
+        }];
+    }
 }
 
 -(NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
