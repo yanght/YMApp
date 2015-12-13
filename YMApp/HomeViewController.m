@@ -58,6 +58,7 @@
     [self setupRefresh];
     
 }
+
 -(void)initData
 {
     _banners=[[HomeGroup alloc]init];
@@ -425,6 +426,5 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
 
 @end

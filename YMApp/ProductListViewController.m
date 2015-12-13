@@ -55,10 +55,18 @@
     self.navigationItem.backBarButtonItem=[[UIBarButtonItem alloc]initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];
     _HUD= [Utils createHUD];
     
+    
     [self initHeader];
     [self initTableView];
     [self initFooterRefersh];
     [self getProductList];
+}
+#pragma 页面返回之后还原tabbar
+-(void)viewWillDisappear:(BOOL)animated
+{
+    CGRect tabFrame=self.tabBarController.tabBar.frame;
+    tabFrame.origin.y=screen_height-49;
+    self.tabBarController.tabBar.frame=tabFrame;
 }
 
 -(void)initHeader
@@ -161,7 +169,7 @@
     CGPoint point=[rec translationInView:_tableView];
     if(point.y<-30)
     {
-         NSLog(@"向上");
+         //NSLog(@"向上");
         [UIView animateWithDuration:0.5 animations:^{
             _headerView.frame=CGRectMake(0, 0, W(_headerView), H(_headerView));
             _tableView.frame=CGRectMake(0, 64, W(_tableView), screen_height-64);
@@ -173,7 +181,7 @@
     }else if(point.y>30)
     {
         [UIView animateWithDuration:0.5 animations:^{
-            NSLog(@"向下");
+            //NSLog(@"向下");
             _headerView.frame=CGRectMake(0, 64, W(_headerView), H(_headerView));
             _tableView.frame=CGRectMake(0, 64+H(_headerView)+2, W(_tableView), screen_height-64-H(_headerView)-2-49);
             CGRect tabFrame=self.tabBarController.tabBar.frame;
@@ -255,7 +263,8 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     ProductViewController *productcontroller=[[ProductViewController alloc]init];
-    
+    Product *product=[_products objectAtIndex:indexPath.section];
+    [productcontroller setCommodityCode:product.CommodityCode];
     [self.navigationController pushViewController:productcontroller animated:YES];
 }
 

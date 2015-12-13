@@ -7,9 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Product.h"
 
-@interface ProductViewController : UIViewController
+@interface ProductViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
 
-    @property (assign,nonatomic) NSInteger id;
+@property (nonatomic,strong)NSString *commodityCode;
+
+@property (nonatomic,strong) Product *product;
+
+@property (nonatomic,strong)UITableView *tableView;
 
 @end
