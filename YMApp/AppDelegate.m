@@ -10,6 +10,9 @@
 #import "HomeViewController.h"
 #import "ProductListViewController.h"
 #import "CategoryViewController.h"
+#import "SearchViewController.h"
+#import "CartViewController.h"
+#import "MemberViewController.h"
 #import "AFNetworking.h"
 @interface AppDelegate ()
 
@@ -25,11 +28,18 @@
     
     HomeViewController *homecontroller=[[HomeViewController alloc]init];
     CategoryViewController *categorycontroller=[[CategoryViewController alloc]init];
-//    ProductListViewController *listcontroller=[[ProductListViewController alloc]init];
+    SearchViewController *searchController=[[SearchViewController alloc
+                                            ]init];
+    CartViewController *cartController=[[CartViewController alloc]init];
+    MemberViewController *membercontroller=[[MemberViewController alloc]init];
     
     
     UINavigationController *homenav=[[UINavigationController alloc]initWithRootViewController:homecontroller];
     UINavigationController *categorynav=[[UINavigationController alloc]initWithRootViewController:categorycontroller];
+    UINavigationController *searchnav=[[UINavigationController alloc]initWithRootViewController:searchController];
+    UINavigationController *cartnav=[[UINavigationController alloc]initWithRootViewController:cartController];
+    UINavigationController *membernav=[[UINavigationController alloc]initWithRootViewController:membercontroller];
+    
 //    UINavigationController *listnav=[[UINavigationController alloc]initWithRootViewController:listcontroller];
 
     homecontroller.title=@"首页";
@@ -40,6 +50,21 @@
     [categorycontroller.tabBarItem setImage:[[UIImage imageNamed:@"iconfont-fenlei"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
     [categorycontroller.tabBarItem setSelectedImage:[[UIImage imageNamed:@"iconfont-fenlei-2"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
     
+    searchController.title=@"搜索";
+    [searchController.tabBarItem setImage:[[UIImage imageNamed:@"iconfont-sousuo"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    [searchController.tabBarItem setSelectedImage:[[UIImage imageNamed:@"iconfont-sousuo-2"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    
+    cartController.title=@"购物车";
+    [cartController.tabBarItem setImage:[[UIImage imageNamed:@"iconfont-gouwuche"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    [cartController.tabBarItem setSelectedImage:[[UIImage imageNamed:@"iconfont-gouwuche-2"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    
+    membercontroller.title=@"用户中心";
+    [membercontroller.tabBarItem setImage:[[UIImage imageNamed:@"iconfont-yonghu"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    [membercontroller.tabBarItem setSelectedImage:[[UIImage imageNamed:@"iconfont-yonghu-2"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+
+    
+
+    
     
 //    listcontroller.title=@"分类";
 //    [listcontroller.tabBarItem setImage:[[UIImage imageNamed:@"iconfont-fenlei"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
@@ -48,7 +73,7 @@
     
     UITabBarController *tabbarcontroller=[[UITabBarController alloc]init];
     
-    NSArray *controllers=@[homenav,categorynav];
+    NSArray *controllers=@[homenav,categorynav,searchnav,cartnav,membernav];
     
     [tabbarcontroller setViewControllers:controllers animated:YES];
     
@@ -59,7 +84,7 @@
     
     
     
-    [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObject:RGB(54, 185,175) forKey:NSForegroundColorAttributeName] forState:UIControlStateSelected];
+    [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObject:MAINCOLOR forKey:NSForegroundColorAttributeName] forState:UIControlStateSelected];
     
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     [self.window makeKeyAndVisible];

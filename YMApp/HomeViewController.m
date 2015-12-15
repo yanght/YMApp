@@ -19,6 +19,7 @@
 #import "HomeBanner.h"
 #import "HomeGroup.h"
 #import "RushTableViewCell.h"
+#import "CityViewController.h"
 
 
 @interface HomeViewController()<UITableViewDelegate,UITableViewDataSource>
@@ -41,10 +42,11 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     self.view.backgroundColor=RGB(246, 246, 246);
-
-    
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     
+    
+    //定义所有子页面返回按钮的名称
+    self.navigationItem.backBarButtonItem=[[UIBarButtonItem alloc]initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];
     
     UIView *headerView=[[UIView alloc]initWithFrame:CGRectMake(0, 0, screen_width, 64)];
     
@@ -53,10 +55,9 @@
     [self.view addSubview:headerView];
     [self initData];
     [self getHomeData];
+    [self initHeader];
     [self initTableView];
-    
     [self setupRefresh];
-    
 }
 
 -(void)initData
@@ -70,7 +71,30 @@
     _group6=[[HomeGroup alloc]init];
     _shortcutIcons=[[HomeGroup alloc]init];
 }
+-(void)initHeader
+{
+    UIView *backView=[[UIView alloc]initWithFrame:CGRectMake(0, 0, screen_width, 64)];
+    backView.backgroundColor=[UIColor whiteColor];
+    
+    UIImageView *logoimgView=[[UIImageView alloc]initWithFrame:CGRectMake(REAL_WIDTH1(20), REAL_WIDTH1(42), REAL_WIDTH1(175), REAL_WIDTH1(55))];
+    UIImage *logoImg=[UIImage imageNamed:@"logo640"];
+    [logoimgView setImage:logoImg];
+    [backView addSubview:logoimgView];
+    
+    //城市
+    UIButton *positionBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [positionBtn setFrame:CGRectMake(screen_width-REAL_WIDTH1(120),   REAL_WIDTH1(42), REAL_WIDTH1(100), 30)];
+    [positionBtn setImage:[UIImage imageNamed:@"position"] forState:UIControlStateNormal];
+    [positionBtn addTarget:self action:@selector(OnPositionBtnTap:) forControlEvents:UIControlEventTouchUpInside];
+  
+    [positionBtn setTitle:@"上海" forState:UIControlStateNormal];
+    [positionBtn setTitleColor:MAINCOLOR forState:UIControlStateNormal];
+    [positionBtn.titleLabel setFont:[UIFont systemFontOfSize:14]];
+    [backView addSubview:positionBtn];
 
+    
+    [self.view addSubview:backView];
+}
 -(void) initTableView
 {
     self.tableView=[[UITableView alloc]initWithFrame:CGRectMake(0, 64, screen_width, screen_height-64-49) style:UITableViewStyleGrouped ];
@@ -82,6 +106,14 @@
     [self.view addSubview:self.tableView];
 }
 
+
+-(void)OnPositionBtnTap:(id)sender
+{
+    CityViewController *citycontroller=[[CityViewController alloc]init];
+    //[self.navigationController presentModalViewController:citycontroller animated:YES];
+    [self.navigationController pushViewController:citycontroller animated:YES];
+    citycontroller.title=@"收货地址";
+}
 -(void)getHomeData
 {
     NSString *urlstr=@"http://weixin.m.yiguo.com/MallOpt/GetMallBanners";
