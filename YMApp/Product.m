@@ -55,7 +55,7 @@
         self.OrderId=dic[@"OrderId"];
         self.PromotionsDetailsId=dic[@"PromotionsDetailsId"];
         self.VoteScore=dic[@"VoteScore"];
-        self.VoteCount=dic[@"GiftRuVoteCountleType"];
+        self.VoteCount=dic[@"VoteCount"];
         self.VotePositiveRate=dic[@"VotePositiveRate"];
         self.CardType=dic[@"CardType"];
         self.IsAutoHide=dic[@"IsAutoHide"];

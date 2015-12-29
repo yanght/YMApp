@@ -15,4 +15,6 @@
 
 @property(nonatomic,strong)HomeGroup *group;
 
+@property(nonatomic,assign)id<ProductTapProtocol> delegate;
+
 @end

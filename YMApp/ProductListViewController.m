@@ -248,7 +248,6 @@
             _pageIndex+=1;
         }
         [_HUD hide:YES];
-        NSLog(@"%lu",(unsigned long)_pageIndex);
         
     }failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         NSLog(@"发生错误！%@",error);
@@ -263,7 +262,7 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     ProductViewController *productcontroller=[[ProductViewController alloc]init];
-    Product *product=[_products objectAtIndex:indexPath.section];
+    Product *product=[_products objectAtIndex:indexPath.row];
     [productcontroller setCommodityCode:product.CommodityCode];
     [self.navigationController pushViewController:productcontroller animated:YES];
 }

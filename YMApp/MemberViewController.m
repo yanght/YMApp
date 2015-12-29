@@ -7,6 +7,7 @@
 //
 
 #import "MemberViewController.h"
+#import "MemberTableViewCell.h"
 
 @interface MemberViewController ()
 
@@ -16,8 +17,38 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self.view setBackgroundColor:GRAYCOLOR];
     // Do any additional setup after loading the view.
+    
+    self.tableView=[[UITableView alloc]initWithFrame:CGRectMake(0, 0, screen_width, screen_height)];
+    self.tableView.delegate=self;
+    self.tableView.dataSource=self;
+    self.tableView.backgroundColor=[UIColor whiteColor];
+    
+    [self.view addSubview:self.tableView];
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *cellzqIndentifier=@"membertableviewcell";
+    MemberTableViewCell *cell=[tableView dequeueReusableCellWithIdentifier:cellzqIndentifier];
+    if(cell==nil)
+    {
+        cell=[[MemberTableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellzqIndentifier];
+    }
+    return cell;
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return screen_height;
+}
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
+
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 1;
 }
 
 - (void)didReceiveMemoryWarning {

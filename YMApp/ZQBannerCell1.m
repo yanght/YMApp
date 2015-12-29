@@ -58,9 +58,5 @@
     return self;
 }
 
--(void)setImages:(NSArray *)images
-{
-    
-}
 
 @end

@@ -14,6 +14,8 @@
 
 @property(nonatomic,strong)HomeGroup *group;
 
+@property(nonatomic,assign)id<ProductTapProtocol> delegate;
+
 -(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier group:(HomeGroup *)group;
 
 @end

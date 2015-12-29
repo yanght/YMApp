@@ -7,6 +7,7 @@
 //
 
 #import "Utils.h"
+#import "AppDelegate.h"
 
 @implementation Utils
 
@@ -20,5 +21,18 @@
     [HUD show:YES];
     return HUD;
 }
-
++(CGSize)sizeWithString:(NSString *)string font:(UIFont *)font
+{
+    CGSize size = CGSizeMake(screen_width-20,MAXFLOAT); //设置一个行高上限
+    
+    NSStringDrawingOptions options =
+        NSStringDrawingTruncatesLastVisibleLine |
+        NSStringDrawingUsesLineFragmentOrigin |
+        NSStringDrawingUsesFontLeading;
+    
+    NSDictionary *attribute = @{NSFontAttributeName:font};
+    
+    CGSize rtnsize=[string boundingRectWithSize:size options:options attributes:attribute context:nil].size;
+    return rtnsize;
+}
 @end

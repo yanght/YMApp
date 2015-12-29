@@ -10,6 +10,7 @@
 #import "AFNetworking.h"
 #import "MBProgressHUD.h"
 #import "City.h"
+#import "CityHeaderTableViewCell.h"
 
 @interface CityViewController ()
 
@@ -71,40 +72,71 @@
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (self.keys==nil|| [self.keys count]==0) {
-        static NSString *cellIdentifier=@"normalcell";
-        UITableViewCell *cell;
+    if (indexPath.section==0) {
+        static NSString *cellIdentifier=@"hotcityCell";
+        CityHeaderTableViewCell *cell;
         cell=[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
         if(!cell){
-            cell=[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
-        }
+            cell=[[CityHeaderTableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier ];
+            }
+        [cell setCityList:[self.hotCityList copy]];
+         cell.selectionStyle=UITableViewCellSelectionStyleNone;
+        cell.backgroundColor=RGB(238, 245, 233);
         return cell;
-    }else
-    {
-    static NSString *cellIdentifier=@"cityCell";
-    UITableViewCell *cell;
-    cell=[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    if(!cell){
-        cell=[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
-    cell.selectionStyle=UITableViewCellSelectionStyleNone;
-    cell.backgroundColor=[UIColor whiteColor];
+    else
+    {
+        if(self.keys==nil|| [self.keys count]==0) {
+            static NSString *cellIdentifier=@"normalcell";
+            UITableViewCell *cell;
+            cell=[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+            if(!cell){
+                cell=[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+            }
+        return cell;
+        }else
+        {
+            static NSString *cellIdentifier=@"cityCell";
+            UITableViewCell *cell;
+            cell=[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+            if(!cell){
+                cell=[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+            }
+            cell.selectionStyle=UITableViewCellSelectionStyleNone;
+            cell.backgroundColor=[UIColor whiteColor];
     
-    NSString *key=self.keys[indexPath.section];
+            NSString *key=self.keys[indexPath.section-1];
     
-    NSArray *citys=[self.cityList objectForKey:key];
+            NSArray *citys=[self.cityList objectForKey:key];
     
-    City *city=citys[indexPath.row];
-    cell.textLabel.text=city.Name;
-    [cell.textLabel setFont:[UIFont systemFontOfSize:13]];
-    
-    return cell;
+            City *city=citys[indexPath.row];
+            cell.textLabel.text=city.Name;
+            [cell.textLabel setFont:[UIFont systemFontOfSize:13]];
+            return cell;
+        }
+
     }
 }
 
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section==0) {
+        
+        static NSString *cellIdentifier=@"hotcityCell";
+        CityHeaderTableViewCell *cell;
+        cell=[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+        if(!cell){
+            cell=[[CityHeaderTableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier ];
+        }
+        [cell setCityList:[self.hotCityList copy]];
+        return cell.cellheight;
+    }
+    return 44;
+}
+    
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return self.cityList.count;
+    return self.cityList.count+1;
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -114,12 +146,14 @@
         return 1;
     }else
     {
-        return [[self.cityList objectForKey:self.keys[section]] count];
+        return [[self.cityList objectForKey:self.keys[section-1]] count];
     }
 }
 -(NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
 {
-    return self.keys;
+    NSMutableArray *array=[[NSMutableArray alloc]initWithArray:self.keys];
+    [array insertObject:@"#" atIndex:0];
+    return [array copy];
 }
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
@@ -128,9 +162,17 @@
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 0, screen_width, REAL_WIDTH1(60))];
     titleLabel.textColor=[UIColor whiteColor];
     titleLabel.backgroundColor = [UIColor clearColor];
-    titleLabel.text=[self.keys objectAtIndex:section];
+    
     titleLabel.textColor=MAINCOLOR;
     [myView addSubview:titleLabel];
+    if (section!=0) {
+        titleLabel.text=[self.keys objectAtIndex:section-1];
+    }else
+    {
+        titleLabel.text=@"自配城市";
+        [titleLabel setFont:[UIFont systemFontOfSize:14]];
+        [titleLabel setTextColor:RGB(108, 108, 108)];
+    }
     return myView;
 }
 
@@ -140,6 +182,9 @@
 }
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
+    if (section==0) {
+        return @"自配城市";
+    }
     return self.keys[section];
 }
 

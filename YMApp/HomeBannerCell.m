@@ -8,6 +8,8 @@
 
 #import "HomeBannerCell.h"
 #import "SDCycleScrollView.h"
+#import "HomeBanner.h"
+#import "ActivityViewController.h"
 
 @interface HomeBannerCell()<SDCycleScrollViewDelegate>
 {
@@ -35,14 +37,25 @@
     return self;
 }
 
--(void)setImages:(NSArray *)images
+-(void)setBanners:(NSArray *)banners
 {
+    _banners=banners;
+    NSMutableArray *images=[[NSMutableArray alloc]init];
+    NSMutableArray *imgLinks=[[NSMutableArray alloc]init];
+   [banners enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+       HomeBanner *banner=obj;
+       [images addObject:banner.PictureUrl];
+       [imgLinks addObject:banner.LinkUrl];
+   }];
    _cycleScrollView2.imageURLStringsGroup = images;
 }
 
 - (void)cycleScrollView:(SDCycleScrollView *)cycleScrollView didSelectItemAtIndex:(NSInteger)index
 {
-    NSLog(@"---点击了第%ld张图片", index);
+    //NSLog(@"---点击了第%ld张图片", index);
+    HomeBanner *banner=[_banners objectAtIndex:index];
+    
+    [self.delegate didSelectBannerUrl:banner atIndex:index];
 }
 
 

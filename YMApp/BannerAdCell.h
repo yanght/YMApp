@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "HomeGroup.h"
+#import "HomeBanner.h"
 
 @interface BannerAdCell : UITableViewCell
 
@@ -18,5 +19,7 @@
 @property(nonatomic,strong)NSString *title;
 
 @property(nonatomic,strong)HomeGroup *group;
+
+@property(nonatomic,assign)id<ProductTapProtocol> delegate;
 
 @end

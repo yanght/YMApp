@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface MemberViewController : UIViewController
+@interface MemberViewController : UIViewController<UITableViewDataSource,UITableViewDelegate>
+
+@property(nonatomic,strong)UITableView *tableView;
 
 @end

@@ -8,12 +8,19 @@
 
 #import <UIKit/UIKit.h>
 #import "Product.h"
+#import "ProductViewModel.h"
+#import "ProductTableViewCell.h"
+#import "ProductSpecCell.h"
 
-@interface ProductViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
+@interface ProductViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,ProductSpecDelegate>
 
 @property (nonatomic,strong)NSString *commodityCode;
 
 @property (nonatomic,strong) Product *product;
+
+@property(nonatomic,strong)ProductViewModel *productViewModel;
+
+@property(nonatomic,strong)ProductTableViewCell *productTableViewCell;
 
 @property (nonatomic,strong)UITableView *tableView;
 

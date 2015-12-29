@@ -20,9 +20,10 @@
 #import "HomeGroup.h"
 #import "RushTableViewCell.h"
 #import "CityViewController.h"
+#import "ActivityViewController.h"
+#import "ProductViewController.h"
 
-
-@interface HomeViewController()<UITableViewDelegate,UITableViewDataSource>
+@interface HomeViewController()<UITableViewDelegate,UITableViewDataSource,HomeBannerDelegate,ProductTapProtocol>
 {
     HomeGroup *_banners;
     HomeGroup *_group1;
@@ -281,12 +282,12 @@
 {
     if(indexPath.section==0)
     {
-        NSMutableArray *images=[[NSMutableArray alloc]init];
+        NSMutableArray *banners=[[NSMutableArray alloc]init];
         [_banners.HomeBanners enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             HomeBanner *banner=obj;
-            [images addObject:banner.PictureUrl];
+            [banners addObject:banner];
         }];
-        if(images.count==0)
+        if(banners.count==0)
         {
             static NSString *cellIndentifier = @"nomorecell";
             HomeBannerCell *cell=[_tableView dequeueReusableCellWithIdentifier:cellIndentifier];
@@ -297,7 +298,8 @@
             static NSString *cellIndentifier = @"homebannercell";
             HomeBannerCell *cell=[_tableView dequeueReusableCellWithIdentifier:cellIndentifier];
             cell=[[HomeBannerCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIndentifier];
-            [cell setImages:images];
+            [cell setBanners:[banners copy]];
+            cell.delegate=self;
             return cell;
         }
     }
@@ -326,6 +328,7 @@
                 cell=[[RushTableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellzqIndentifier group:_group1];
             }
             [cell setGroup:_group1];
+            cell.delegate=self;
             return cell;
         }
         
@@ -350,6 +353,7 @@
             }
             [cell setTitle:_group2.GroupTitle];
             [cell setGroup:_group2];
+            cell.delegate=self;
             return cell;
         }
     
@@ -374,6 +378,7 @@
                 cell=[[ZQBannerCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellzqIndentifier group:_group3];
             }
             [cell setGroup:_group3];
+            cell.delegate=self;
             return cell;
         }
     }else if(indexPath.section==5)
@@ -396,6 +401,7 @@
                 cell=[[ZQBannerCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellzqIndentifier group:_group4];
             }
             [cell setGroup:_group4];
+            cell.delegate=self;
             return cell;
         }
     }else if(indexPath.section==6)
@@ -420,6 +426,7 @@
             }
             [cell setTitle:_group6.GroupTitle];
             [cell setGroup:_group6];
+            cell.delegate=self;
             return cell;
         }
 
@@ -432,6 +439,34 @@
     cell.backgroundColor=[UIColor colorWithRed:239.0/255  green:243.0/255  blue:246.0/255  alpha:1];
 }
 
+-(void)didSelectBannerUrl:(HomeBanner *)banner atIndex:(NSInteger)index
+{
+    ActivityViewController *controller=[[ActivityViewController alloc]init];
+    controller.url=banner.LinkUrl;
+    controller.title=banner.BannerName;
+    [self.navigationController pushViewController:controller animated:YES];
+}
+
+-(void)didSelectBannerAdCell:(HomeBanner *)banner
+{
+    ActivityViewController *controller=[[ActivityViewController alloc]init];
+    controller.title=banner.BannerName;
+    [self.navigationController pushViewController:controller animated:YES];
+}
+-(void)didSelectProduct:(NSString *)commodityCode
+{
+    ProductViewController *productController=[[ProductViewController alloc]init];
+    productController.commodityCode=commodityCode;
+    [self.navigationController pushViewController:productController animated:YES];
+}
+
+-(void)didSelectActivity:(NSString *)activityUrl
+{
+    ActivityViewController *controller=[[ActivityViewController alloc]init];
+    controller.url=activityUrl;
+    [self.navigationController pushViewController:controller animated:YES];
+
+}
 
 -(void) setupRefresh
 {

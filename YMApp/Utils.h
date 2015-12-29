@@ -13,4 +13,6 @@
 
 +(MBProgressHUD *)createHUD;
 
++(CGSize)sizeWithString:(NSString *)string font:(UIFont *)font;
+
 @end

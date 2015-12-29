@@ -57,6 +57,15 @@
         imgView.frame=frame;
         [imgView setTag:300+i];
         [self.contentView addSubview:imgView];
+        
+        YmGestureRecognizer*tap=[[YmGestureRecognizer alloc]initWithTarget:self action:@selector(didTapView:)];
+        NSMutableDictionary *dic=[[NSMutableDictionary alloc]init];
+        [dic setObject:banner.LinkCode forKey:@"LinkCode"];
+        [dic setObject:banner.LinkType forKey:@"LinkType"];
+        [dic setObject:banner.LinkUrl forKey:@"LinkUrl"];
+        tap.parm=dic;
+        imgView.userInteractionEnabled=YES;
+        [imgView addGestureRecognizer:tap];
     }
     }
     return self;
@@ -73,6 +82,22 @@
         
         [imgView sd_setImageWithURL:[[NSURL alloc]initWithString:banner.PictureUrl]];
     
+    }
+}
+
+-(void)didTapView:(YmGestureRecognizer *)sender
+{
+    NSMutableDictionary *dic=sender.parm;
+    
+    NSString *linkCode=[dic objectForKey:@"LinkCode"];
+    NSInteger linkType=[[dic objectForKey:@"LinkType"] integerValue];
+    NSString *linkUrl=[dic objectForKey:@"LinkUrl"];
+    
+    if (linkType==1) {
+        [self.delegate didSelectProduct:linkCode];
+    }else if (linkType==3)
+    {
+        [self.delegate didSelectActivity:linkUrl];
     }
 }
 @end
