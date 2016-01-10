@@ -8,6 +8,7 @@
 
 #import "ProductTableViewCell.h"
 
+
 @implementation ProductTableViewCell
 
 -(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier productViewModel:(ProductViewModel *)productViewModel
@@ -27,11 +28,12 @@
         productPriceLabel.text=[NSString stringWithFormat:@"¥ %@",productViewModel.product.CommodityPrice];
         productPriceLabel.frame=productViewModel.productPriceRect;
         [self.contentView addSubview:productPriceLabel];
-    
         
     }
     return self;
 }
+
+
 - (void)awakeFromNib {
     // Initialization code
 }

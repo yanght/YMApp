@@ -14,8 +14,13 @@
 #import "CartViewController.h"
 #import "MemberViewController.h"
 #import "AFNetworking.h"
-@interface AppDelegate ()
+#import "CartService.h"
+#import "CookieHelper.h"
 
+@interface AppDelegate ()
+{
+    UITabBarItem *_cartTabBarItem;
+}
 @end
 
 @implementation AppDelegate
@@ -26,10 +31,30 @@
     
     self.window=[[UIWindow alloc]initWithFrame:[UIScreen mainScreen].bounds];
     
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    
+    [self.window makeKeyAndVisible];
+    
+    [self getYGSiteCookie];
+    
+    [self setNav];//修改程序中所有的显示的navigationbar的颜色，字体
+    
+    [self addNavAndTabbarController];
+    
+    [self addCartCountRefershNotification];
+    
+    return YES;
+}
+
+/**
+ *  添加导航控制器和Tabbar控制器
+ */
+-(void)addNavAndTabbarController
+{
     HomeViewController *homecontroller=[[HomeViewController alloc]init];
     CategoryViewController *categorycontroller=[[CategoryViewController alloc]init];
     SearchViewController *searchController=[[SearchViewController alloc
-                                            ]init];
+                                             ]init];
     CartViewController *cartController=[[CartViewController alloc]init];
     MemberViewController *membercontroller=[[MemberViewController alloc]init];
     
@@ -39,9 +64,8 @@
     UINavigationController *searchnav=[[UINavigationController alloc]initWithRootViewController:searchController];
     UINavigationController *cartnav=[[UINavigationController alloc]initWithRootViewController:cartController];
     UINavigationController *membernav=[[UINavigationController alloc]initWithRootViewController:membercontroller];
-    
-//    UINavigationController *listnav=[[UINavigationController alloc]initWithRootViewController:listcontroller];
 
+    
     homecontroller.title=@"首页";
     [homecontroller.tabBarItem setImage:[[UIImage imageNamed:@"iconfont-shouye"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
     [homecontroller.tabBarItem setSelectedImage:[[UIImage imageNamed:@"iconfont-shouye-2"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
@@ -61,15 +85,6 @@
     membercontroller.title=@"用户中心";
     [membercontroller.tabBarItem setImage:[[UIImage imageNamed:@"iconfont-yonghu"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
     [membercontroller.tabBarItem setSelectedImage:[[UIImage imageNamed:@"iconfont-yonghu-2"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
-
-    
-
-    
-    
-//    listcontroller.title=@"分类";
-//    [listcontroller.tabBarItem setImage:[[UIImage imageNamed:@"iconfont-fenlei"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
-//    [listcontroller.tabBarItem setSelectedImage:[[UIImage imageNamed:@"iconfont-fenlei-2"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
-    
     
     UITabBarController *tabbarcontroller=[[UITabBarController alloc]init];
     
@@ -78,21 +93,46 @@
     [tabbarcontroller setViewControllers:controllers animated:YES];
     
     self.window.rootViewController=tabbarcontroller;
+    _cartTabBarItem=cartController.tabBarItem;
     
-    
-    //UITabBar *tablebar=tabbarcontroller.tabBar;
-    
-    
+    CartService *svc=[[CartService alloc]init];
+    NSInteger count= [svc getCartCount];
+    if (count>0) {
+        cartController.tabBarItem.badgeValue=[NSString stringWithFormat:@"%ld",count];
+    }
     
     [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObject:MAINCOLOR forKey:NSForegroundColorAttributeName] forState:UIControlStateSelected];
-    
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
-    [self.window makeKeyAndVisible];
-    [self getYGSiteCookie];
-    [self setNav];//修改程序中所有的显示的navigationbar的颜色，字体
-    return YES;
 }
 
+/**
+ *  注册购物车数量通知
+ */
+-(void)addCartCountRefershNotification
+{
+    //注册购物车数量通知观察者
+    //获取通知中心单例对象
+    NSNotificationCenter * center = [NSNotificationCenter defaultCenter];
+    //添加当前类对象为一个观察者，name和object设置为nil，表示接收一切通知
+    [center addObserver:self selector:@selector(changeTabBarBadgeValue:) name:ChangeTabbarBadgeValueNotification object:nil];
+}
+
+/**
+ *  购物车数量通知方法
+ *
+ *  @param sender 通知对象
+ */
+-(void)changeTabBarBadgeValue:(NSNotification *)sender
+{
+   NSString *cartCount=sender.userInfo[@"cartCount"];
+    if ([cartCount integerValue]>0) {
+    _cartTabBarItem.badgeValue=cartCount;
+    }else
+    {
+    _cartTabBarItem.badgeValue=nil;
+    }
+}
+
+//获取站点cookie
 -(void)getYGSiteCookie
 {
     // 3.创建网络请求
@@ -104,14 +144,22 @@
                           returningResponse:nil
                                       error:nil];
     
-//    NSHTTPCookieStorage *cookieJar = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-//    for (NSHTTPCookie *cookie in [cookieJar cookies]) {
-//        NSLog(@"%@", cookie);
-//    }
+    CookieHelper *helper=[[CookieHelper alloc]init];
+   // NSString *cartstr=[helper getCookieWithUrl:GET_COOKIE_URL cookieName:CART_COOKIE_NAME];
+    NSString *cartstr=[[NSString alloc]init];
+    NSUserDefaults *userDef = [NSUserDefaults standardUserDefaults];
+    if (userDef) {
+       cartstr= [userDef objectForKey:USERDEFAULT_CART_KEY];
+    }
+    
+    NSMutableDictionary *cookieValues=[helper bulidCookieName:CART_COOKIE_NAME value:cartstr domain:COOKIE_DOMAIN];
+    [helper addCookieWithUrl:GET_COOKIE_URL value:cookieValues];
 }
 
+/**
+ *  设置导航栏样式
+ */
 - (void)setNav
-
 {
     
     UINavigationBar *bar = [UINavigationBar appearance];

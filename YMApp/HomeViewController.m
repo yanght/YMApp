@@ -45,7 +45,6 @@
     self.view.backgroundColor=RGB(246, 246, 246);
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     
-    
     //定义所有子页面返回按钮的名称
     self.navigationItem.backBarButtonItem=[[UIBarButtonItem alloc]initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];
     
@@ -441,17 +440,21 @@
 
 -(void)didSelectBannerUrl:(HomeBanner *)banner atIndex:(NSInteger)index
 {
+    self.hidesBottomBarWhenPushed=YES;
     ActivityViewController *controller=[[ActivityViewController alloc]init];
     controller.url=banner.LinkUrl;
     controller.title=banner.BannerName;
     [self.navigationController pushViewController:controller animated:YES];
+    self.hidesBottomBarWhenPushed=NO;
 }
 
 -(void)didSelectBannerAdCell:(HomeBanner *)banner
 {
+    self.hidesBottomBarWhenPushed=YES;
     ActivityViewController *controller=[[ActivityViewController alloc]init];
     controller.title=banner.BannerName;
     [self.navigationController pushViewController:controller animated:YES];
+    self.hidesBottomBarWhenPushed=NO;
 }
 -(void)didSelectProduct:(NSString *)commodityCode
 {
@@ -462,10 +465,11 @@
 
 -(void)didSelectActivity:(NSString *)activityUrl
 {
+    self.hidesBottomBarWhenPushed=YES;
     ActivityViewController *controller=[[ActivityViewController alloc]init];
     controller.url=activityUrl;
     [self.navigationController pushViewController:controller animated:YES];
-
+    self.hidesBottomBarWhenPushed=NO;
 }
 
 -(void) setupRefresh

@@ -19,6 +19,10 @@
 #import "ProductCommentCell.h"
 #import "BaseProductCell.h"
 #import "ProductHeaderView.h"
+#import "CommentViewController.h"
+#import "CookieCartModel.h"
+#import "CookieProductModel.h"
+#import "CartService.h"
 
 @interface ProductViewController ()
 {
@@ -29,18 +33,43 @@
 
 @implementation ProductViewController
 
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    self.navigationController.navigationBar.alpha=0;
+}
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    self.navigationController.navigationBar.alpha=1;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
-    //self.navigationController.navigationBar.hidden=YES;
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent];
     self.view.backgroundColor=[UIColor whiteColor];
     [self initTableView];
+    [self setNav];
     _HUD = [Utils createHUD];
     [self.view addSubview:_HUD];
     [self getProductList];
-    
 }
 
+-(void)setNav
+{
+    UIView *backview=[[UIView alloc ]initWithFrame:CGRectMake(0, 0, screen_width, 64)];
+    [self.view addSubview:backview];
+    [self.view bringSubviewToFront:backview];
+    
+    UIButton *button=[[UIButton alloc]initWithFrame:CGRectMake(0, 20, 44, 44)];
+    [button setImage:[UIImage imageNamed:@"iconfont-zuo"] forState:UIControlStateNormal];
+//    button.backgroundColor=[UIColor redColor];
+    [button addTarget:self action:@selector(backClick:) forControlEvents:UIControlEventTouchUpInside];
+    [backview addSubview:button];
+}
+-(void) backClick:(id)sender
+{
+    [self.navigationController popViewControllerAnimated:YES];
+}
 -(void)initTableView
 {
     self.tableView=[[UITableView alloc]initWithFrame:CGRectMake(0, -20, screen_width, self.view.frame.size.height) style:UITableViewStyleGrouped];
@@ -48,7 +77,35 @@
     self.tableView.delegate=self;
     self.tableView.dataSource=self;
     [self.view addSubview:self.tableView];
+    
+    UIButton *addCartButton=[[UIButton alloc]initWithFrame:CGRectMake(screen_width-REAL_WIDTH1(150), screen_height-49-REAL_WIDTH1(150), REAL_WIDTH1(100), REAL_WIDTH1(100))];
+    [addCartButton setImage:[UIImage imageNamed:@"add_cart"] forState:UIControlStateNormal];
+    addCartButton.layer.cornerRadius=REAL_WIDTH1(50);
+    addCartButton.backgroundColor=MAINCOLOR;
+    [addCartButton addTarget:self action:@selector(addToCart:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:addCartButton];
+    [self.view bringSubviewToFront:addCartButton ];
 }
+
+-(void)addToCart:(id)sender
+{
+    CookieProductModel *product=[[CookieProductModel alloc]init];
+    product.Id=self.product.CommodityId;
+    product.Code=self.product.CommodityCode;
+    product.GId=@"";
+    
+    ProductNameCell *cell=cells[0];
+    product.Amount=cell.number;
+    
+    CartService *svc=[[CartService alloc]init];
+    
+    NSInteger count= [svc addProduct:product];
+    
+    self.tabBarController.tabBar.items[3].badgeValue=[NSString stringWithFormat:@"%ld",count];
+//    self.tabBarItem.badgeValue=[NSString stringWithFormat:@"%ld",count];
+}
+
+
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     return 1;
@@ -62,11 +119,6 @@
     return REAL_WIDTH1(600);
 }
 
-//-(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
-//{
-//    return REAL_WIDTH1(600);
-//}
-
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     ProductHeaderView *headerView=[[ProductHeaderView alloc]initWithFrame:CGRectMake(0, 0, screen_width, REAL_WIDTH1(600))];
@@ -74,21 +126,12 @@
     [headerView setImages:self.product.Pictures];
     return headerView;
 }
-//
-//-(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
-//{
-//    ProductHeaderView *headerView=[[ProductHeaderView alloc]initWithFrame:CGRectMake(0, 0, screen_width, REAL_WIDTH1(600))];
-//    headerView.backgroundColor=[UIColor whiteColor];
-//    [headerView setImages:self.product.Pictures];
-//    return headerView;
-//}
+
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (![self.product.Promotions isEqual:[NSNull null]]) {
-        return 5+[self.product.Promotions count];
-    }
-    return 5;
-   }
+    return  [cells count];
+}
+
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([cells count]>0) {
@@ -119,7 +162,7 @@
 
 -(void)getProductList{
     //[_HUD show:YES];
-    NSString *urlstr= [NSString stringWithFormat:@"http://h5.yiguo.com/ProductOpt/GetProductInfo?commodityCode=%@",self.commodityCode] ;
+    NSString *urlstr= [NSString stringWithFormat:@"http://weixin.m.yiguo.com/ProductOpt/GetProductInfo?commodityCode=%@",self.commodityCode] ;
     NSURL *url = [NSURL URLWithString:[urlstr stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc]initWithRequest:request];
@@ -182,7 +225,7 @@
         cell.delegate=self;
         [cells addObject:cell];
     }
-    if (![product.PlaceOfOrigin isEqualToString:@""]) {
+    if (![product.PlaceOfOrigin isEqualToString:@""]||![product.DeliveryTips isEqualToString:@""]) {
         cellIdentifier=@"placeodorigincell";
         PlaceOfOriginCell *cell=[[PlaceOfOriginCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         [cell setPlaceOfOrigin:product.PlaceOfOrigin deliveryTips:product.DeliveryTips];
@@ -205,11 +248,22 @@
     [cells addObject:cell];
 }
 
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    BaseProductCell *cell=[cells objectAtIndex:indexPath.row];
+    if ([cell.reuseIdentifier isEqual:@"productcommentcell"]) {
+        self.hidesBottomBarWhenPushed=YES;
+        CommentViewController *commentController=[[CommentViewController alloc]init];
+        commentController.commodityId=self.product.CommodityId;
+        [self.navigationController pushViewController:commentController animated:YES];
+        self.hidesBottomBarWhenPushed=NO;
+    }
+}
+
 -(void)didSelectProduct:(NSString *)commodityCode
 {
     self.commodityCode=commodityCode;
     [self getProductList];
-    
 }
 
 - (void)didReceiveMemoryWarning {

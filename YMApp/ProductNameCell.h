@@ -17,6 +17,8 @@
 
 @property(nonatomic,strong)NSString *oldProductPrice;
 
+@property(nonatomic,assign)NSInteger number;
+
 -(void)setProductName:(NSString *)productName productPrice:(NSString *)productprice oldProductPrice:(NSString *)oldProductPrice;
 
 @end

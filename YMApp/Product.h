@@ -8,7 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Product : NSObject
+@protocol Product @end
+
+@interface Product : JSONModel
 
 @property (nonatomic,copy) NSString *CommodityId;
 @property (nonatomic,copy) NSString *CommodityCode;
@@ -69,6 +71,7 @@
 @property (nonatomic,copy) NSString *Words;
 @property (nonatomic,copy) NSString *IsSecondary;
 @property (nonatomic,copy) NSString *SubTitle;
+
 
 
 -(Product *)initWithDictionary:(NSDictionary *)dic;

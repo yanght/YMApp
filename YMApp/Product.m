@@ -79,7 +79,10 @@
     return self;
     
 }
-
++(BOOL)propertyIsOptional:(NSString*)propertyName
+{
+    return YES;
+}
 +(Product *) initWithDictionary:(NSDictionary *)dic
 {
     Product *product=[[Product alloc]initWithDictionary:dic];

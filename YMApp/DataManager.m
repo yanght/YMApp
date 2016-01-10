@@ -44,4 +44,35 @@
     
 }
 
++ (void)getInfoWithSubUrl:(NSString *)subUrl
+               parameters:(NSDictionary *)Parameters
+                    block:(void (^)(id result, NSError *error))block{
+    
+    
+    [[self class] checkNetWorkStatus];
+    
+    
+    NSLog(@"url = %@",[NSString stringWithFormat:@"%@%@",@"",subUrl]);
+    
+    NSLog(@"parameter = %@",Parameters);
+    
+    [[[self class] sharedManager] GET:[NSString stringWithFormat:@"%@%@",@"",subUrl] parameters:Parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        
+        id  result = [[NSString alloc]initWithData:operation.responseData encoding:NSUTF8StringEncoding];
+        NSLog(@"resultDic = %@",result);
+        if (block && result) {
+            block(result,nil);
+        }
+        
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error.description);
+        if (block) {
+            block(nil,error);
+        }
+    }];
+    
+    
+    
+}
+
 @end

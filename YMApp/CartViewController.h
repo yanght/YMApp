@@ -7,7 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CartModel.h"
+#import "CartTableViewCell.h"
+#import "CartSettleView.h"
 
-@interface CartViewController : UIViewController
+@interface CartViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,CartTableViewCellDelegate>
+
+@property(nonatomic,strong)UITableView *tableView;
+
+@property(nonatomic,strong)UIView *coupanView;
+
+@property(nonatomic,strong)CartSettleView *settleView;
+
+@property(nonatomic,strong)CartModel *cartModel;
 
 @end

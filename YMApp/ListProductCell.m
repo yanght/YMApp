@@ -8,6 +8,8 @@
 
 #import "ListProductCell.h"
 #import "UIImageView+WebCache.h"
+#import "Product.h"
+#import "CartService.h"
 
 @interface ListProductCell ()
 {
@@ -61,12 +63,30 @@
 //    _oldPrice.textColor=[UIColor grayColor];
 //    [self.contentView addSubview:_oldPrice];
     
+    UIButton *addCartButton=[[UIButton alloc]initWithFrame:CGRectMake(screen_width-REAL_WIDTH1(90),REAL_WIDTH1((200-40)/2),REAL_WIDTH1(80),REAL_WIDTH1(80))];
+    [addCartButton setImage:[UIImage imageNamed:@"addtocart"] forState:UIControlStateNormal];
+    [addCartButton setImageEdgeInsets:UIEdgeInsetsMake(REAL_WIDTH1(20), REAL_WIDTH1(20), REAL_WIDTH1(20), REAL_WIDTH1(20))];
+    [addCartButton addTarget:self action:@selector(addToCart:) forControlEvents:UIControlEventTouchUpInside];
+    [self.contentView addSubview:addCartButton];
     
 }
 
+-(void)addToCart:(id)sender
+{
+    CookieProductModel *product=[[CookieProductModel alloc]init];
+    product.Id=self.product.CommodityId;
+    product.Code=self.product.CommodityCode;
+    product.GId=@"";
+    product.Amount=1;
+    CartService *svc=[[CartService alloc]init];
+    NSInteger count=[svc addProduct:product];
+    
+    
+}
 #pragma 加载子控件数据
 -(void)setProduct:(Product *)product
 {
+    _product=product;
 #pragma 商品图片
     _imgview.frame=CGRectMake(REAL_WIDTH1(25), REAL_WIDTH1(25), REAL_WIDTH1(148), REAL_WIDTH1(148));
     //[_imgview  sd_setImageWithURL:[[NSURL alloc]initWithString:product.SmallPic ]];
